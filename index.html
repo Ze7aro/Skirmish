@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#12151c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>KOTA Skirmish</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-screen="home">
+  <div id="loading"><h1>KOTA</h1><div id="loadbar"><i></i></div><p>Cargando arte…</p></div>
+
+  <!-- CABECERA (siempre visible fuera de la batalla) -->
+  <header id="topbar">
+    <button id="avatar" aria-label="Perfil"><img id="avatar-img" alt=""></button>
+    <div id="lvl"><b id="lvl-num">Nv 1</b><div class="xpbar"><i id="xpfill"></i></div></div>
+    <button id="wallet-btn" aria-label="Recursos"><span class="coin"></span><b id="gold-num">0</b><i class="caret">▾</i></button>
+    <div id="wallet" hidden>
+      <div class="wrow"><i>🔋</i><div><b>Energía</b><small>Para mejorar unidades</small></div><span id="wallet-energy">0</span></div>
+      <div class="wrow"><i>💠</i><div><b>Cores</b><small>Para mejorar unidades</small></div><span id="wallet-cores">0</span></div>
+      <button id="wallet-shop" class="primary">Conseguir más</button>
+    </div>
+  </header>
+
+  <!-- MAPA (pantalla principal) -->
+  <section id="home" class="screen" hidden>
+    <div id="map-body"></div>
+    <div id="map-footer"></div>
+  </section>
+
+  <!-- MAZMORRAS -->
+  <section id="dungeon" class="screen scroll" hidden>
+    <h2 class="ptitle">Mazmorras</h2>
+    <div id="dungeon-body"></div>
+  </section>
+
+  <!-- EJÉRCITO -->
+  <section id="deck" class="screen scroll" hidden>
+    <div id="army-body"></div>
+  </section>
+
+  <!-- TIENDA -->
+  <section id="store" class="screen scroll" hidden>
+    <div id="store-body"></div>
+  </section>
+
+  <!-- PERFIL (se abre desde el avatar) -->
+  <section id="profile" class="screen scroll" hidden>
+    <div id="profile-tabs" class="tabs"></div>
+    <div id="profile-body"></div>
+  </section>
+
+  <!-- BATALLA -->
+  <section id="battle" class="screen" hidden>
+    <header id="hud">
+      <button id="pause" class="icon">⏸</button>
+      <div id="timer">3:00</div>
+      <span id="mines"></span>
+      <button id="speed" class="icon">x1</button>
+      <button id="quit" class="icon">✕</button>
+    </header>
+    <div id="stage"><canvas id="c"></canvas><div id="pausebanner" hidden>Pausa</div><div id="goal" hidden></div><button id="signal" class="icon" aria-label="Señales">📣</button><div id="signal-menu" hidden></div><div id="coach" hidden></div></div>
+    <footer id="tray">
+      <div id="energy"><span class="bolt">⚡</span><div id="energybar"><i></i></div><b id="energynum">5</b><div id="next" hidden></div><button id="leader" class="hero"></button></div>
+      <div id="cards"></div>
+    </footer>
+  </section>
+
+  <nav id="nav">
+    <button data-go="store" id="nav-store"><i><img src="art/ui/kit/tab_bag.webp" alt=""></i><span>Tienda</span></button>
+    <button data-go="deck" id="nav-deck"><i><img src="art/ui/kit/tab_army.webp" alt=""></i><span>Ejército</span></button>
+    <button data-go="home" id="nav-home" class="center on"><i><img src="art/ui/kit/tab_scroll.webp" alt=""></i><span>Mapa</span></button>
+    <button data-go="dungeon" id="nav-dungeon"><i><img src="art/ui/kit/tab_battle.webp" alt=""></i><span>Mazmorras</span></button>
+    <button id="nav-guild" class="locked" aria-disabled="true"><i><img src="art/ui/kit/tab_tower.webp" alt=""></i><span>Guild</span><em>🔒</em></button>
+  </nav>
+
+  <!-- VENTANAS -->
+  <div id="briefing" class="modal" hidden>
+    <div class="panel wide">
+      <h2 id="b-title"></h2><p id="b-desc" class="muted"></p>
+      <h3>Objetivos</h3><ul id="b-objs" class="objs"></ul>
+      <div id="b-opts" class="chips"></div>
+      <div id="b-mutwrap">
+        <h3>Mutadores <small>(opcional: más dificultad, más recompensa)</small></h3>
+        <div id="b-muts" class="chips"></div><div id="b-bonus" class="bonus"></div>
+      </div>
+      <div id="b-deck" class="row center"></div>
+      <div class="row center"><button id="b-go" class="primary big">¡A luchar!</button><button id="b-cancel">Cerrar</button></div>
+    </div>
+  </div>
+
+  <div id="result" class="modal" hidden><div class="panel wide" id="result-body"></div></div>
+
+  <div id="chest" class="modal" hidden>
+    <div class="panel"><h2>Cofre</h2><canvas id="chest-canvas" width="240" height="200"></canvas><div id="chest-text"></div><button id="chest-ok" class="primary" hidden>¡Genial!</button></div>
+  </div>
+
+  <div id="loot" class="modal" hidden><div class="panel wide" id="loot-body"></div></div>
+
+  <div id="unit" class="modal" hidden><div class="panel wide" id="unit-body"></div></div>
+
+  <div id="talents" class="modal" hidden><div class="panel wide" id="talents-body"></div></div>
+
+  <div id="settings" class="modal" hidden>
+    <div class="panel">
+      <h2>Ajustes</h2>
+      <button id="set-sound" class="toggle"></button>
+      <button id="set-vibrate" class="toggle"></button>
+      <button id="install" hidden>Instalar en el móvil</button>
+      <button id="set-reset" class="ghost">Borrar progreso</button>
+      <button id="set-close" class="primary">Cerrar</button>
+    </div>
+  </div>
+
+  <div id="toast" hidden></div>
+
+  <script src="data/kota_roster.js"></script>
+  <script src="art/manifest.js"></script>
+  <script src="data.js"></script>
+  <script src="talents.js"></script>
+  <script src="game.js"></script>
+  <script src="meta.js"></script>
+  <script src="rival.js"></script>
+  <script src="season.js"></script>
+  <script src="economy.js"></script>
+  <script src="cosmetics.js"></script>
+  <script src="net.js"></script>
+  <script src="audio.js"></script>
+  <script src="render.js"></script>
+  <script src="ui.js"></script>
+  <script src="ui_store.js"></script>
+  <script src="ui_online.js"></script>
+  <script src="ui_main.js"></script>
+  <script src="ui_planet.js"></script>
+</body>
+</html>

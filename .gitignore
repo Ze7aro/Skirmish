@@ -1,0 +1,10 @@
+# Fuentes de arte pesadas: se pasan aparte (pendrive) y solo hacen falta para volver a empaquetar con tools/pack_*.py
+art/design_complete/
+art/source_generated/
+art/source_regenerated/
+
+# Sistema / editor / temporales
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
